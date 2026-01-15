@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     ],
     apple: '/logo-logo.png',
   },
-} // ✅ THIS was missing
+} 
 
 export default function RootLayout({
   children,
