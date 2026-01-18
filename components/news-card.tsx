@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { TrendingUp, TrendingDown, Minus, Sparkles, ChevronDown, ChevronUp, ExternalLink, Star } from "lucide-react"
+import { TrendingUp, TrendingDown, Minus, Sparkles, ChevronDown, ChevronUp, ExternalLink, Star, Calendar } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface NewsCardProps {
@@ -102,9 +102,17 @@ export function NewsCard({ news, isFavorite, onToggleFavorite }: NewsCardProps) 
     return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
   }
 
+  const isPositive = news.priceChange >= 0
+  const formattedDate = new Date(news.publishedAt).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })
+
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="pb-4">
+    <article className="news-card animate-fade-in-up">
+      {/* Header Section */}
+      <div className="news-card-header">
         <div className="flex flex-col gap-3">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
             <div className="flex-1">
@@ -140,103 +148,62 @@ export function NewsCard({ news, isFavorite, onToggleFavorite }: NewsCardProps) 
                   />
                 </Button>
               </div>
-              <h3 className="text-lg font-semibold leading-tight text-balance mb-1">{news.headline}</h3>
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1.5">
+              <h3 className="text-lg font-semibold leading-tight text-balance mb-1 news-card-title">{news.headline}</h3>
+              <div className="flex items-center gap-3 text-sm text-muted-foreground news-card-meta">
+                <div className="flex items-center gap-1.5 news-card-source">
                   <span className="text-base">{news.sourceIcon}</span>
                   <span>{news.source}</span>
                 </div>
-                <span>•</span>
-                <span>{news.company}</span>
+                <span className="flex items-center gap-2 text-[color:var(--text-muted)]">
+                  <Calendar className="h-3 w-3" />
+                  {formattedDate}
+                </span>
               </div>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => setExpanded(!expanded)} className="shrink-0">
-              <Sparkles className="h-4 w-4 mr-2" />
-              AI Analysis
-              {expanded ? <ChevronUp className="h-4 w-4 ml-2" /> : <ChevronDown className="h-4 w-4 ml-2" />}
-            </Button>
-          </div>
-
-          <div className="border-t pt-3">
-            <ul className="space-y-2">
-              {news.summary.map((point, index) => (
-                <li key={index} className="text-sm text-foreground/80 flex gap-2 leading-relaxed">
-                  <span className="text-primary mt-0.5 shrink-0">•</span>
-                  <span className="flex-1">{point}</span>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-3 pt-3 border-t">
-              <a
-                href={news.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
-              >
-                Read more
-                <ExternalLink className="h-3.5 w-3.5" />
-              </a>
             </div>
           </div>
         </div>
-      </CardHeader>
+      </div>
 
-      {expanded && (
-        <CardContent className="pt-0">
-          <div className="border-t pt-4">
-            {isAnalyzing ? (
-              <div className="space-y-3">
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-5/6" />
-              </div>
-            ) : error ? (
-              <div className="text-center py-4">
-                <p className="text-sm text-destructive mb-3">{error}</p>
-                <Button variant="outline" size="sm" onClick={analyzeSentiment}>
-                  Try Again
-                </Button>
-              </div>
-            ) : analysis && analysis.sentiment ? (
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <Badge
-                    className={`${getSentimentColor(analysis.sentiment)} flex items-center gap-2 px-3 py-1.5 text-sm font-semibold`}
-                  >
-                    {getSentimentIcon(analysis.sentiment)}
-                    {analysis.sentiment.toUpperCase()}
-                  </Badge>
-                  <span className="text-sm text-muted-foreground">
-                    Confidence: {Math.round(analysis.confidence * 100)}%
-                  </span>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold mb-2">AI Summary</h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{analysis.summary}</p>
-                </div>
-
-                <div className="bg-muted/50 rounded-lg p-4">
-                  <h4 className="font-semibold mb-1 text-sm">Suggested Buy Range</h4>
-                  <p className="text-lg font-mono font-bold text-primary">{analysis.buyRange}</p>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold mb-2">Key Points</h4>
-                  <ul className="space-y-2">
-                    {analysis.keyPoints.map((point, index) => (
-                      <li key={index} className="text-sm text-muted-foreground flex gap-2">
-                        <span className="text-primary">•</span>
-                        <span className="flex-1">{point}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            ) : null}
+      {/* Body Section - Two Column Layout */}
+      <div className="news-card-body-layout">
+        {/* Left Side - Summary Box */}
+        <div className="summary-section">
+          <div className="summary-box">
+            <p className="summary-title">Key Points:</p>
+            <ul className="summary-list">
+              {news.summary.map((point, index) => (
+                <li key={index} className="summary-point">
+                  {point}
+                </li>
+              ))}
+            </ul>
           </div>
-        </CardContent>
-      )}
-    </Card>
+        </div>
+
+        {/* Right Side - AI Analysis */}
+        <div className="ai-section">
+          <div className="ai-analysis-card">
+            <button className="ai-analysis-btn-compact">
+              <Sparkles className="h-4 w-4" />
+              <span>AI Analysis</span>
+            </button>
+            <p className="ai-analysis-desc">
+              Get sentiment analysis, trend insights, and investment recommendations powered by AI
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Section */}
+      <div className="news-card-footer">
+        <div className="mt-3 pt-3 border-t">
+          <div className="read-more-box">
+            <a href={news.url} target="_blank" rel="noopener noreferrer" className="read-more-btn">
+              Read Full Article
+            </a>
+          </div>
+        </div>
+      </div>
+    </article>
   )
 }

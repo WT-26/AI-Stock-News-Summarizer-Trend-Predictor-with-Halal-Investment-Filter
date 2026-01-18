@@ -1,8 +1,7 @@
 "use client"
 
-import { Badge } from "@/components/ui/badge"
+import { Leaf } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Filter } from "lucide-react"
 
 interface HalalFilterToggleProps {
   enabled: boolean
@@ -11,14 +10,21 @@ interface HalalFilterToggleProps {
 
 export function HalalFilterToggle({ enabled, onToggle }: HalalFilterToggleProps) {
   return (
-    <Button variant={enabled ? "default" : "outline"} onClick={() => onToggle(!enabled)} className="gap-2">
-      <Filter className="h-4 w-4" />
-      Halal Filter
-      {enabled && (
-        <Badge variant="secondary" className="ml-1 bg-white/20 text-white border-0">
-          ON
-        </Badge>
-      )}
+    <Button
+      onClick={() => onToggle(!enabled)}
+      className={`halal-filter-toggle transition-all duration-300 ${
+        enabled ? "active" : ""
+      }`}
+      variant={enabled ? "default" : "outline"}
+    >
+      <Leaf
+        className={`h-4 w-4 mr-2 transition-all duration-300 ${
+          enabled ? "text-white" : "text-[var(--success)]"
+        }`}
+      />
+      <span className={enabled ? "text-white" : "text-[var(--success)]"}>
+        {enabled ? "Halal Certified" : "Halal Filter"}
+      </span>
     </Button>
   )
 }
